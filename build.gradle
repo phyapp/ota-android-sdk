@@ -1,0 +1,9 @@
+plugins {
+    id 'com.android.library' version '8.13.0' apply false
+    id 'maven-publish' apply false
+    id 'signing' apply false
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.buildDir
+}

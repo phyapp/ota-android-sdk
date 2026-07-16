@@ -1,0 +1,83 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+android {
+    namespace 'com.ota.otalib'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 23
+        targetSdk 35
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'io.github.phyapp'
+            artifactId = 'otalib'
+            version = '2.3.9'
+
+            afterEvaluate {
+                from components.release
+            }
+
+            pom {
+                name = 'OTA Android SDK'
+                description = 'A BLE OTA firmware update library for Android'
+                url = 'https://github.com/phyapp/ota-android-sdk'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'sc.chen'
+                        name = '奉加App支持'
+                        email = 'shuangchao.chen@phyplusinc.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:github.com/phyapp/ota-android-sdk.git'
+                    developerConnection = 'scm:git:ssh://github.com/phyapp/ota-android-sdk.git'
+                    url = 'https://github.com/phyapp/ota-android-sdk'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = project.findProperty('ossrhUsername') ?: ''
+                password = project.findProperty('ossrhPassword') ?: ''
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.release
+}
