@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'signing'
+    id 'com.gradleup.nmcp'
 }
 
 android {
@@ -65,16 +66,15 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username = project.findProperty('ossrhUsername') ?: ''
-                password = project.findProperty('ossrhPassword') ?: ''
-            }
-        }
+}
+
+nmcp {
+    publishToCentralPortal {
+        // Publishing Token from https://central.sonatype.com/account → Publishing Tokens
+        username = project.findProperty('centralPortalUsername') ?: ''
+        password = project.findProperty('centralPortalPassword') ?: ''
+        // AUTOMATIC = 发布后自动 release, USER_MANAGED = 手动在 web UI 确认
+        publishingType = 'AUTOMATIC'
     }
 }
 
