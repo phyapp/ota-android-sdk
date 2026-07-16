@@ -2,7 +2,6 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'signing'
-    id 'com.gradleup.nmcp'
 }
 
 android {
@@ -29,6 +28,11 @@ android {
     }
 }
 
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
 publishing {
     publications {
         release(MavenPublication) {
@@ -37,8 +41,9 @@ publishing {
             version = '2.3.9'
 
             afterEvaluate {
-                from components.release
+                artifact "${project.buildDir}/outputs/aar/otalib-release.aar"
             }
+            artifact sourcesJar
 
             pom {
                 name = 'OTA Android SDK'
@@ -65,16 +70,6 @@ publishing {
                 }
             }
         }
-    }
-}
-
-nmcp {
-    publishToCentralPortal {
-        // Publishing Token from https://central.sonatype.com/account → Publishing Tokens
-        username = project.findProperty('centralPortalUsername') ?: ''
-        password = project.findProperty('centralPortalPassword') ?: ''
-        // AUTOMATIC = 发布后自动 release, USER_MANAGED = 手动在 web UI 确认
-        publishingType = 'AUTOMATIC'
     }
 }
 
