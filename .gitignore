@@ -16,3 +16,6 @@
 local.properties
 *.jks
 *.pepk
+secring.gpg
+public-key.gpg
+local.properties
