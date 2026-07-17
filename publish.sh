@@ -14,6 +14,17 @@ echo "=== Step 2: Package Maven artifacts ==="
 rm -rf "$STAGING_DIR"
 mkdir -p "$STAGING_DIR/$GROUP_PATH"
 cp "$M2_REPO/$GROUP_PATH/"* "$STAGING_DIR/$GROUP_PATH/"
+
+echo "=== Generate MD5 and SHA1 checksums ==="
+cd "$STAGING_DIR/$GROUP_PATH"
+for f in *.jar *.aar *.pom *.module; do
+    [ -f "$f" ] || continue
+    # Strip any existing checksum files before regenerating
+    md5 -q "$f" > "$f.md5"
+    shasum "$f" | awk '{print $1}' > "$f.sha1"
+done
+cd - > /dev/null
+
 cd "$STAGING_DIR"
 zip -r "$ZIP_FILE" .
 cd - > /dev/null
@@ -33,7 +44,7 @@ HTTP_BODY=$(curl -s -w "\n%{http_code}" \
   "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC")
 
 HTTP_CODE=$(echo "$HTTP_BODY" | tail -1)
-BODY=$(echo "$HTTP_BODY" | head -n -1)
+BODY=$(echo "$HTTP_BODY" | sed '$d')
 
 echo "HTTP Code: $HTTP_CODE"
 echo "Response: $BODY"
